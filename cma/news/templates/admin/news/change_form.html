@@ -1,0 +1,60 @@
+{% extends "admin/change_form.html" %}
+
+{% block javascripts %}
+    {{ block.super }}
+    <script type="text/javascript" src="{{ jsi18nurl|default:'../../../jsi18n/' }}"></script>
+    <script type="text/javascript" charset="utf-8">
+        (function($){
+
+            var TEMPLATE_LINHA = '<div class="grp-row grp-cells-1 review">' +
+                                 '<div class="l-2c-fluid l-d-4">' +
+                                 '  <div class="c-1">' +
+                                 '      <label for="id_jogo" class="required">Review automático</label>' +
+                                 '  </div>' +
+                                 '  <div class="c-2" style="font-size: 1.2em;font-style: italic;background-color: rgba(255, 0, 0, 0.1);padding: 20px 10px;">${review}' +
+                                 '  </div>' +
+                                 '</div>' +
+                                 '</div>';
+
+            var TEMPLATE_MAPA = '<div class="grp-row grp-cells-1 maps">' +
+                                 '<div class="l-2c-fluid l-d-4">' +
+                                 '  <div class="c-1">' +
+                                 '      <label for="id_jogo" class="required">Mapa automático</label>' +
+                                 '  </div>' +
+                                 '  <div class="c-2" style="background-color: rgba(0, 0, 0, 0.1);padding: 10px;">' +
+                                 '  <iframe width="950" height="150" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="${mapa}&output=embed&iwloc=near"></iframe>' +
+                                 '  </div>' +
+                                 '</div>' +
+                                 '</div>';
+
+            $(function(){
+                $('#id_jogo').change(function() {
+
+                    var url = "/servico/" + $(this).val();
+
+                    $('.grp-module').find(".grp-cells-1.review").remove();
+                    $('.grp-module').find(".grp-cells-1.maps").remove();
+
+                    $.getJSON(url, function(data) {
+
+                        var review_atual = TEMPLATE_LINHA;
+                        var mapa_atual = TEMPLATE_MAPA;
+
+                        $.each(data, function(key, val) {
+                            if(key === "review"){
+                                review_atual = review_atual.replace("${review}", val);
+                            }
+                            if(key === "maps"){
+                                mapa_atual = mapa_atual.replace("${mapa}", val);
+                            }
+
+                        });
+
+                        $(mapa_atual).insertAfter( $('.grp-module').find('.jogo') );
+                        $(review_atual).insertAfter( $('.grp-module').find('.jogo') );
+                    });
+                });
+            });
+        }(grp.jQuery));
+    </script>
+{% endblock %}
